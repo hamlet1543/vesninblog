@@ -6,7 +6,6 @@
  */
 
 require('./bootstrap');
-
 window.Vue = require('vue');
 
 /**
@@ -18,6 +17,14 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('task-card', require('./components/TaskCard.vue'));
+Vue.component('download-component', require('./components/DownloadComponent.vue'));
+Vue.component('add-card', require('./components/AddCard.vue'));
+Vue.component('nav-component', require('./components/NavComponent.vue'));
+Vue.component('settings-component', require('./components/SettingsComponent.vue'));
+Vue.component('folder-tasks', require('./components/FolderTasks.vue'));
+Vue.component('list-cards', require('./components/ListCards.vue'));
+Vue.component('carousel-component', require('./components/CarouselComponent.vue'));
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key)))
@@ -28,6 +35,10 @@ Vue.component('example-component', require('./components/ExampleComponent.vue'))
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    data: {
+    	reg: false
+    }
 });

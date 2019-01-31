@@ -1,82 +1,77 @@
 @extends('layouts.app_tasks')
 @section('content')
-	<div class="card-body">
-		@include('errors.errors_tasks')
-	</div>
-	<form action="{{ url('tasks') }}" method="post" class="form-horizontal">
-		{{ csrf_field() }}
-		<div class="row">
-			<div class="col-sm-2">
-				<div class="form-group">
-				    <label for="t_date">Дата</label>
-		   			<input type="date" name="date" id="t_date" class="form-control">
-		   		</div>
-	  		</div>
-	  		<div class="col-sm-4">
-				<div class="form-group">
-			    	<label for="t_name">Наименование</label>
-	   				<input type="text" name="name" id="t_name" class="form-control">
-	   			</div>
-	  		</div>
-	  	</div>		
-		<div class="row">			
-			<div class="col-sm-6">
-				<div class="form-group">
-					<label for="t_description">Описание</label>
-					<textarea type="textarea" name="description" id="t_description" class="form-control"></textarea>
-				</div>			
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-2">
-				<button type="submit" class="btn btn-success form-control"><i class="fa fa-plus"></i>Добавить</button>
-			</div>
-		</div>
-	</form>
-	<br>
-	@if(count($tasks)>0)
-		<div class="card">
-			<div class="card-heading">
-				Текущие задачи
-			</div>
-			<div class="card-body">
-				<table class="table table-striped task-table">
 
-					<thead>
-						<tr>
-							<th>Дата</th>
-							<th>Задача</th>
-							<th>Описание</th>
-							<th>&nbsp</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach($tasks as $task)
-						<tr>
-							<td class="table-text">
-								{{ $task->date }}
-							</td>
-							<td class="table-text">
-								{{ $task->name }}
-							</td>							
-							<td class="table-text">
-								{{ $task->description }}
-							</td>
-							<td>
-								<form action="{{url('tasks/'.$task->id)}}" method="post"> 
-									{{ csrf_field() }}
-									{{ method_field('DELETE')}}
+	{{ csrf_field() }}
+	@if (Route::has('login'))
+		@auth
+			<nav-component></nav-component>
+			<list-cards :tasks="{{ $tasks }}" :tasks_done="{{ $tasks_done }}" :nav="{{ $nav }}" :angle="{{ $angle }}" :distance="{{ $distance }}" :images="{{ $images }}"></list-cards>
+		@else
+		<div id="reg" v-if="!reg">
+			<form method="POST" action="{{ route('login') }}">
+				@csrf
+				<label for="name">E-mail:</label>
+				<input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
+				@if ($errors->has('email'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('email') }}</strong>
+                    </span>
+                @endif
+				<label for="username">Пароль:</label>
+				<!-- <p><a href="#">Забыли пароль?</a></p> -->
+				<input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+				@if ($errors->has('password'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('password') }}</strong>
+                    </span>
+                @endif
+				<div id="lower">
+					<!-- <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> -->
 
-									<button class="btn btn-danger">
-										Delete
-									</button>		
-								</form>
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
+					<input type="submit" value="Войти">
+					<a href="#" @click="reg = true">Регистрация</a>
+				</div>
+			</form>
 			</div>
-		</div>
+
+			<div id="reg" class="reg" v-if="reg">
+			<form method="POST" action="{{ route('register') }}">
+				@csrf
+
+				<label for="name">Login:</label>
+				<input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+                @if ($errors->has('name'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('name') }}</strong>
+                    </span>
+                @endif
+				<label for="name">E-mail:</label>
+				<input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
+                @if ($errors->has('email'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('email') }}</strong>
+                    </span>
+                @endif
+				<label for="username">Пароль:</label>
+				<input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+                @if ($errors->has('password'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('password') }}</strong>
+                    </span>
+                @endif
+                <label for="username">Повторите пароль:</label>
+                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
+
+				<div id="lower">
+					<!-- <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> -->
+
+					<input type="submit" value="Зарегистрировать">
+					<a href="#" @click="reg = false">Форма входа</a>
+				</div>
+			</form>
+		</div>        
+
+	    @endauth
 	@endif
+
 @endsection
