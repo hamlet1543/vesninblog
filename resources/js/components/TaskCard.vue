@@ -3,49 +3,41 @@
         <transition v-bind:name="transitionName">
         <div v-if="show">
             <div class="card" v-bind:style="{background : background}">
-                <div class="card_body">
-                    <div class="card_content">
-                        <div class="card_img" v-if="edit||this.task.path">                           
-                            <div class="image" v-if="this.task.path&&this_url">
-                                <img v-bind:src="this.task.path" > 
-                                <div class="img-close" @click="deleteImage" v-if="edit">&#10008;</div>                              
-                            </div>
-                            <div class="image_edit" v-if="!this.task.path||!this_url">
-                                <div class="col-sm-12">
-                                    <div class="task_header">
-                                        Изображение            
-                                        <div class="circle-plus circle-img" @click="addImage">
-                                            <div class="circle"></div>
-                                            <div class="horizontal"></div>
-                                            <div class="vertical"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-<!--                             <download-component :path="path" :task_id="this.task.id" :nav="nav.id" @delete-img='edit = true'></download-component>
-                         -->                        
-                        </div>
-                        <div class="card_text">
+                <div class="card-body">
+                    <div class="card-content">
 
-                            <div class="name" v-if="!name_edit">
-                                {{name}}
-                                <div class="edit" v-if="!this.done" @click="name_edit = !name_edit; edit = true">&#9998;</div>
+                        <div class="card-img" v-if="edit || this.task.path">                           
+                            <div class="image" v-if="this.task.path">
+                                <img v-bind:src="this.task.path" > 
+                                <font-awesome-icon icon="times-circle" class="img-close" color="#16a085" v-if="edit" @click="deleteImgTask"/>
                             </div>
-                            <div class="name_edit" v-if="name_edit">
+                            <div v-if="!this.task.path">
+                                Изображение
+                                <font-awesome-icon icon="plus-circle" class="icon-pointer" color="#16a085" @click="addImage"/>           
+                            </div>                   
+                        </div>
+
+                        <div class="card-text">
+
+                            <div class="text-edit" v-if="!nameEdit">
+                                {{name}}
+                                <font-awesome-icon icon="pencil-alt" class="edit" color="#16a085" v-if="!this.done" @click="nameEdit = !nameEdit; edit = true"/>
+                            </div>
+                            <div v-if="nameEdit">
                                 <input type="text" name="name" id="t_name" class="form-control" placeholder="Наименование" v-model="name">
                             </div>
 
-                            <div class="description" v-if="!description_edit">
+                            <div class="text-edit" v-if="!descriptionEdit">
                                 {{description}}
-                                <div class="edit" v-if="!this.done" @click="description_edit = !description_edit; edit = true">&#9998;</div>
+                               <font-awesome-icon icon="pencil-alt" class="edit" color="#16a085" v-if="!this.done" @click="descriptionEdit = !descriptionEdit; edit = true"/>
                             </div>
-                            <div class="description_edit" v-if="description_edit">
+                            <div v-if="descriptionEdit">
                                 <textarea  type="textarea" name="description" id="t_description" class="form-control" v-model="description" placeholder="Описание" style="height: 200px;">{{description}}</textarea>
                             </div>
 
                         </div>
                     </div>
-                    <div class="card_footer">
+                    <div class="card-footer">
                         <button class="btn btn-success" style="float: left;" @click="editTask" v-if="edit">Сохранить</button>
                         <button class="btn btn-danger" style="float: right;"@click="cancel" v-if="edit">Отменить</button>
 
@@ -62,13 +54,11 @@
 
 <script>
     export default {
-        props:['task', 'taskKey', 'done', 'nav', ], 
+        props:['task', 'taskKey', 'done'], 
         data(){
             return{
             showPath:'',
              show: true,
-             this_url: true,
-             id: 'task_' + this.task.id,
              name: this.task.name,
              description: this.task.description,
              path: this.task.path,
@@ -77,18 +67,13 @@
              background:'#fff',
 
              edit: false,
-             name_edit:false,             
-             description_edit:false,
+             nameEdit:false,             
+             descriptionEdit:false,
             }
         },
         mounted(){
             
-        },
-        watch:{
-            task: function () {               
-               this.this_url = true
-            }
-        },
+        },        
         methods:{
             doneTask(){
                     this.transitionName = "makecard";
@@ -96,7 +81,7 @@
                     axios.post('/tasks/'+this.task.id+'/done').then(response => ( 
                         this.show = false,
                         setTimeout(() => {
-                        this.$emit('tasksreload', {
+                        this.$emit('tasks_reload', {
                             tasks: response.data.tasks,
                             tasks_done: response.data.tasks_done
                         }) 
@@ -110,7 +95,7 @@
                     axios.post('/tasks/'+this.task.id+'/notdone').then(response => ( 
                         this.show = false,
                         setTimeout(() => {
-                        this.$emit('tasksreload', {
+                        this.$emit('tasks_reload', {
                             tasks: response.data.tasks,
                             tasks_done: response.data.tasks_done
                         }) 
@@ -123,8 +108,9 @@
                 axios.delete('/tasks/'+this.task.id).then(response => (
                     this.show = false,
                     setTimeout(() => {
-                        this.$emit('tasksreload', {
-                            tasks: response.data.tasks
+                        this.$emit('tasks_reload', {
+                            tasks: response.data.tasks,
+                            tasks_done: response.data.tasks_done
                         }) 
                     }, 500)
                 ));
@@ -137,32 +123,29 @@
                     }).then(response => (
                         this.path = $("#t_image").val(),
                         this.edit = false,
-                        this.name_edit = false,
-                        this.description_edit = false 
+                        this.nameEdit = false,
+                        this.descriptionEdit = false 
                     ));
          
             },
             cancel(){
                 this.edit = false;
-                this.name_edit = false;             
-                this.description_edit = false;   
+                this.nameEdit = false;             
+                this.descriptionEdit = false;   
             },
-            addImage(){
-                console.log('addImage');
-                this.$emit('editimg',{
+            addImage(){  
+            console.log(this.taskKey);              
+                this.$emit('edit_img',{
                     task_key: this.taskKey
                 })
                 $("#imagesModal").modal('show');
                 this.url = true;
             },
-            deleteImage(url){
-                axios.post('/tasks/'+this.task.id+'/image/delete').then(response => (
-                   this.this_url = false
-
-                    )).catch(error => {
-                    console.log(error);
+            deleteImgTask(){                
+                this.$emit('delete_img_task',{
+                    task_key: this.taskKey                   
                 })
-            }
+            }           
         }
 
     }

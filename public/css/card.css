@@ -1,15 +1,15 @@
-.background_bottom, .background_side
+.background-bottom, .background-side
 {
   width:90%;
   height: 700px;
   margin:40px;
   position: relative;
 }
-.background_bottom
+.background-bottom
 {
     background:#FFF;
 }
-.background_bottom:before, .background_bottom:after
+.background-bottom:before, .background-bottom:after
 {
   z-index: -1;
   position: absolute;
@@ -29,7 +29,7 @@
   -ms-transform: rotate(-3deg);
   transform: rotate(-3deg);
 }
-.background_bottom:after
+.background-bottom:after
 {
   -webkit-transform: rotate(3deg);
   -moz-transform: rotate(3deg);
@@ -42,7 +42,7 @@
 
 
 
-.background_side:before, .background_side:after
+.background-side:before, .background-side:after
 {
   z-index: -2;
   position: absolute;
@@ -58,7 +58,7 @@
   box-shadow: -10px 15px 40px #777;
 
 }
-.background_side:after
+.background-side:after
 {
     right:70px;
     left:auto;
@@ -67,12 +67,18 @@
 
 
 
-.task_header{
+.task-header{
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
 }
-.task_cards_list {
+
+.icon-pointer{
+  cursor: pointer;
+}
+
+.task-cards-list {
 
   overflow: hidden;
 /*  width: 900px;
@@ -86,7 +92,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
 }
-.task_card{
+.task-card{
   position:absolute;
 }
 .card{
@@ -100,7 +106,7 @@
   flex-direction: column;
   justify-content:center;
 }
-.card_body{
+.card-body{
   border: 1px solid #fd7e14;
   padding:5px;
   height:500px;
@@ -113,39 +119,40 @@
 form.card{
   z-index:1;
 }
-.task_cards_list .card{
+.task-cards-list .card{
   /*transform: rotateY(0deg);*/
   transition: all 0.5s ease-in-out;
   z-index:0;
 }
-.task_cards_list .card:hover {
+.task-cards-list .card:hover {
   transform: scale(1.1) /*rotateY(2deg)*/;
 }
 
-.card_img img{
+.card-img img{
   border-radius: 5px;
   width: 100%;
   max-height: 200px; 
 }
-.card_content{
+.card-content{
   display: flex;
   flex-direction: column;
   justify-content:flex-start;
 }
-.card_text{
+.card-text{
   display: flex;
   flex-direction: column;
   justify-content:flex-start;
   text-align:left; 
 }
-.card_footer{
+.card-footer{
   display: flex;
   flex-direction: row;
   justify-content:space-between;
 }
 
 
-.name, .description, .card_img {
+.text-edit, .card-img {
+  text-align: left;
   display: inline-block;
   position: relative;
 }
@@ -160,7 +167,7 @@ form.card{
   width: 30px;
   cursor:pointer;
 }
-.name:hover .edit, .description:hover .edit, .card_img:hover .edit {
+.text-edit:hover .edit, .card-img:hover .edit {
   opacity: 1;
 }
 
@@ -231,22 +238,4 @@ form.card{
   transform: scale(1.4);
   }  
 }
-
-
-
-
-
-/*.circle-plus {height:96px; width:96px; position: relative; }
-.circle-plus .circle {position: absolute; width: 72px; height: 72px; border-radius: 100%; border: solid 6px #16a085; top: 12px; left: 12px; cursor: pointer;}
-.circle-plus .horizontal {position: absolute;  width: 36px; height: 6px; background-color: #16a085; top: 45px; left: 30px; cursor: pointer;}
-.circle-plus .vertical {position: absolute;  width: 6px; height: 36px; background-color: #16a085; top: 30px; left: 45px; cursor: pointer;}
-*/
-.circle-plus {height:32px; width:32px; position: relative; bottom: -6px;}
-.circle-plus.circle-img {bottom: 2px;}
-.circle-plus .circle {position: absolute; width: 24px; height: 24px; border-radius: 100%; border: solid 2px #16a085; top: 4px; left: 4px; cursor: pointer;}
-.circle-plus .horizontal {position: absolute;  width: 12px; height: 2px; background-color: #16a085; top: 15px; left: 10px; cursor: pointer;}
-.circle-plus .vertical {position: absolute;  width: 2px; height: 12px; background-color: #16a085; top: 10px; left: 15px; cursor: pointer;}
-
-
-
 

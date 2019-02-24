@@ -4,8 +4,8 @@
 	{{ csrf_field() }}
 	@if (Route::has('login'))
 		@auth
-			<nav-component></nav-component>
-			<list-cards :tasks="{{ $tasks }}" :tasks_done="{{ $tasks_done }}" :nav="{{ $nav }}" :angle="{{ $angle }}" :distance="{{ $distance }}" :images="{{ $images }}"></list-cards>
+			<nav-component :user="{{ $user }}" :navs="{{ $navs }}" ></nav-component>
+			<list-cards :tasks_load="{{ $tasks }}" :tasks_done_load="{{ $tasks_done }}" :images_load="{{ $images }}" :nav="{{ $nav }}" :folder_name="{{ $folder_name }}":angle_load="{{ $angle }}" :distance_load="{{ $distance }}" ></list-cards>
 		@else
 		<div id="reg" v-if="!reg">
 			<form method="POST" action="{{ route('login') }}">

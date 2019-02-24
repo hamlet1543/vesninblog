@@ -1,9 +1,11 @@
 <template>
 	<div>
-		<div id="edit_alert" v-if="alert_show" v-bind:class="'alert alert-'+status+' alert-dismissible fade show input-small'" role="alert">
-	    	{{edit_text}}
-	    	<button type="button" class="close" @click="alert_show = false" aria-label="Close">
-		        <span aria-hidden="true">&times;</span>
+		<div v-if="alertShow" v-bind:class="'alert alert-'+status+' alert-dismissible fade show input-small'" role="alert">
+	    	{{alertText}}
+	    	<button type="button" class="close" @click="alertShow = false" aria-label="Close">
+		        <span aria-hidden="true">
+		        	<font-awesome-icon icon="times" color="#808080"/>
+		        </span>
 		    </button>
 		</div>
 	
@@ -13,92 +15,100 @@
 		<nav class="nav-main">
 			<label for="nav-toggle" class="nav-main-toggle" onclick></label>
 			<div class="user">
-				<div class="user_text" v-if="!user_edit"> 
-					<div class="user_name">
-						 <ul class="navbar-nav ml-auto">
-						 	<li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{name}} <span class="caret"></span>
-                                </a>
+				<div v-if="!userEdit"> 
+					
+					<ul class="navbar-nav ml-auto">
+					 	<li class="nav-item dropdown">
 
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="/logout"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+					 		<div class="dropdown open">
+									<a id="navbarDropdown" class="nav-link dropdown-toggle login-name" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{login}} <span class="caret"></span>
+                            	</a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">                                    
+                                    <button class="dropdown-item item-pointer" @click="userEdit = true, loginEdit = true">                                 
+                                       Изменить login
+                                    </button>
+                                    <button class="dropdown-item item-pointer" @click="userEdit = true, passwordEdit = true">                                       
+                                       Изменить пароль
+                                    </button>
+                                    <button class="dropdown-item item-pointer" @click="userEdit = true, avaEdit = true">                               
+                                       Изменить аватар
+                                    </button>
+
+                                    <div class="dropdown-divider"></div>
+                                    <button class="dropdown-item item-pointer" href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">                                                     
                                        Logout
-                                    </a>
+                                    </button>
 
                                     <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                                       
+                                    	<input type="hidden" name="_token" v-model="csrf">                             
                                     </form> 
                                 </div>
-                            </li>
-						 	</ul>
-						
-						<div class="edit" @click="user_edit = true">&#9998;</div>
-					</div>
-				</div>
-				<div class="user_edit" v-if="user_edit">
-					<div class="user_name">
-						<input type="text" name="user_name" id="user_name" class="form-control" placeholder="login" v-model="this_name">
-						<div class="save" @click="editName">&#10004;</div>
-						<div class="cancel" @click="folder_edit = false">&#10008;</div>
-					</div>
-					<div class="user_password">
-						<div class="user_name" v-if="!password_edit">
-							Изменить пароль
-							<div class="edit" @click="password_edit = true">&#9998;</div>
-						</div>
-						<div class="user_name" v-if="password_edit">
-							Изменить пароль
-							<div class="save" @click="editPassword">&#10004;</div>
-							<div class="cancel" @click="password_edit = false">&#10008;</div>
-							<input type="password" class="form-control" v-model="current_password" name="current_password" placeholder="Текущий пароль">
-							<input type="password" class="form-control" v-model="new_password" name="new_password" placeholder="Новый пароль">
-							<input type="password" class="form-control" v-model="password_confirm" name="password_confirmation" placeholder="Повторить новый пароль">
-						</div>
-					</div>
-					<div class="user_name" v-if="!isAva">
-						<input type="file" name="image" v-show="false" @change="sync" ref="avaBtn" >
-						<button type="button" name="image" class="btn btn-warning" @click="cloneAvaBtn">Загрузить аватар</button>
+                            </div>
 
-						<button type="button" class="btn btn-success" @click="download" v-if="!showDownload && imgName"><i class="fa fa-plus"></i>Загрузить</button>
+                        </li>
+					</ul>						
+					
+				</div>
+
+				<div class="nav-edit-login" v-if="loginEdit">
+					<input type="text" class="form-control" placeholder="login" v-model="loginChange">
+					<div class="nav-edit-footer">
+						<button type="button" class="btn btn-success" @click="loginOK">ОК</button>
+						<button type="button" class="btn btn-danger" @click="loginCancel">Отмена</button>
+					</div>
+				</div>	
+				<div class="nav-edit-password" v-if="passwordEdit">
+					<input type="password" class="form-control" v-model="passwordCurrent" placeholder="Текущий пароль">
+					<input type="password" class="form-control" v-model="passwordNew" placeholder="Новый пароль">
+					<input type="password" class="form-control" v-model="passwordConfirm" placeholder="Повторить пароль">
+					<div class="nav-edit-footer">
+						<button type="button" class="btn btn-success" @click="passwordOK">ОК</button>
+						<button type="button" class="btn btn-danger" @click="passwordCancel">Отмена</button>
+					</div>
+				</div>				
+				<div class="nav-edit-ava" v-if="avaEdit">
+					<div v-if="!isAva">
+						<input type="file" name="image" v-show="false" @change="sync" ref="avaBtn" >
+						<div class="nav-edit-footer">
+							<button type="button" name="image" class="btn btn-warning" @click="cloneAvaBtn" v-if="!imgName">Выбрать</button>
+							<button type="button" class="btn btn-success" @click="download" v-if="!showDownload && imgName"><i class="fa fa-plus"></i>Загрузить</button>
+							<button type="button" class="btn btn-danger" @click="avaCancel">Отмена</button>
+						</div>
 						<div class="progress" style="height: 40px;" v-if="showDownload">
                             <div class="progress-bar" role="progressbar" :style="{ width: fileProgress + '%' }">{{ fileCurrent }}</div>
                         </div>
 					</div>
-					<div class="user_name" v-if="isAva">						
-						<button type="button" name="image" class="btn btn-danger" @click="avaDelete">Удалить аватар</button>
-					</div>
-					 
-				</div>
+					<div class="nav-edit-footer" v-if="isAva">					
+						<button type="button" name="image" class="btn btn-warning" @click="avaDelete">Удалить</button>
+						<button type="button" class="btn btn-danger" @click="avaCancel">Отмена</button>
+					</div>							
+				</div>						
 
 				<div class="user_img">
-					<img :src="ava_src" alt="user" class="rounded-circle" style="object-fit:cover;height: 150px; width: 150px;">
+					<img :src="avaSrc" alt="user" class="rounded-circle" style="object-fit:cover;height: 150px; width: 150px;">
 				</div>
 			</div>
 
-			<div class="folder_list">
-				<div class="folder" folder_id="0" folder_parent_id="0" v-bind:style="{ paddingLeft: '0px', transition: 'opacity .5s .0s, transform .5s .0s' }">
-					<div>
-						<div class="name" v-if="!folder_edit">
-							<a href="/tasks/">{{this.main_name}}</a>
-							<div class="edit" @click="folder_edit = true">&#9998;</div>
-							<div class="add" @click="folder_add = true">&#10133;</div>
-						</div>
-						<div class="name folder_edit" v-if="folder_edit">
-							<input type="text" name="folder_name_edit" id="f_name_edit" class="form-control" placeholder="Наименование" v-model="nameEdit">
-							<div class="save" @click="editFolder">&#10004;</div>
-							<div class="cancel" @click="folder_edit = false">&#10008;</div>
-						</div>
-						<div class="name folder_add" v-if="folder_add">
-							<input type="text" name="folder_name_add" id="f_name_add" class="form-control" placeholder="Наименование" v-model="nameAdd">
-							<div class="save" @click="addFolder">&#10004;</div>
-							<div class="cancel" @click="folder_add = false">&#10008;</div>
-						</div>
+			<div class="folder-list">
+				<div class="folder" v-bind:style="{ paddingLeft: '0px', transition: 'opacity .5s .0s, transform .5s .0s' }">
+					<div class="folder-edit" v-if="!folderEdit">
+						<a href="/tasks/">{{nameFolderFirst}}</a>
+						<font-awesome-icon icon="pencil-alt" color="#dadada" class="icon"  @click="folderEdit = true" v-if="!folderAdd"/>
+						<font-awesome-icon icon="folder-plus" color="#dadada" class="icon" size="lg" @click="folderAdd = true" v-if="!folderAdd"/>
+					</div>
+					<div class="folder-edit" v-if="folderEdit">
+						<input type="text" class="form-control-edit" placeholder="Наименование" v-model="nameFolderFirstChange">
+						<font-awesome-icon icon="check" color="#dadada" class="icon"  @click="editFirstFolder"/>
+						<font-awesome-icon icon="times" color="#dadada" class="icon" @click="folderEdit = false"/>
+					</div>
+					<div class="folder-edit" v-if="folderAdd">
+						<input type="text" class="form-control-edit" placeholder="Наименование" v-model="folderNameAdd">
+						<font-awesome-icon icon="check" color="#dadada" class="icon"  @click="addNewFolder"/>
+						<font-awesome-icon icon="times" color="#dadada" class="icon" @click="folderAdd = false"/>
 					</div>
 				</div>
-				<div class="folder" v-for="(folder,key) in this.folders_this" v-bind:folder_id="folder.id" v-bind:folder_parent_id="folder.parent_id"  v-bind:style="{ paddingLeft: folder.level*15+'px', transition: 'opacity .5s '+folder.level/10+'s, transform .5s '+folder.level/10+'s' }">
+				<div class="folder" v-for="(folder,key) in this.folders"  v-bind:style="{ paddingLeft: folder.level*15+'px', transition: 'opacity .5s '+folder.level/10+'s, transform .5s '+folder.level/10+'s' }">
 					<folder-tasks :folder="folder" :level="folder.level"  @navreload='reload'></folder-tasks>            
 				</div>            
 			</div>
@@ -111,50 +121,122 @@
 
 <script>
 export default {
-	props:['folders', 'parent', 'test', 'user'], 
+	props:['user', 'navs'], 
 	data(){
 		return{
-			showDownload:false,
+			userEdit:false,
+			loginEdit:false,
+			passwordEdit:false,
+			avaEdit:false,
+
+			login: this.user.name,
+			loginChange:this.user.name,
+			passwordCurrent:'',	
+			passwordNew:'',
+			passwordConfirm:'',
+			isAva:false,
+			avaSrc:'/img/no-image.jpg',
 			imgName:'',	
+			showDownload:false,
 			fileProgress: 0,
             fileCurrent: '',
-			alert_show: false,
-			current_password:'',	
-			new_password:'',
-			password_confirm:'',
-			this_name:'',
-			edit_text:'',
+
+			alertText:'',
+			alertShow: false,
 			status:'',
-			user_edit:false,
-			password_edit:false,
-			folder_add:false,
-			folder_edit:false,
-			main_name:'',
-			folders_this:'',
-			nameAdd:'',
-			nameEdit:'',
-			name:'',
-			isAva:false,
-			ava_src:'/img/no-image.jpg'
+
+			folderAdd:false,
+			folderEdit:false,
+			nameFolderFirst: this.user.task,
+			nameFolderFirstChange: this.user.task,			
+
+			folders: this.navs,
+			folderNameAdd:'',
+
+			csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+
 
 
 		}
 	},
 	mounted(){
-		axios.post('/nav').then(response => {  
-			if (response.data.user.avatar){
-				this.ava_src = response.data.user.avatar
-				this.isAva = true
-			}
-			this.nameEdit = response.data.parent,              
-			this.main_name = response.data.parent,
-			this.name = response.data.user.name,             
-			this.this_name = response.data.user.name,
-			this.folders_this = JSON.parse(response.data.navs)
-
-			});        
+		if(this.user.avatar){
+			this.avaSrc = this.user.avatar;
+			this.isAva = true;
+		} 
 	},
 	methods:{
+		loginOK(){
+			axios.post('/name_edit',{
+				name: this.loginChange
+			}).then(response => (
+				this.alertText = response.data.text,
+				this.status = response.data.status,
+				this.userEdit = (!(this.status == 'success')),				
+				this.alertShow=true,
+				window.setTimeout(()=>{
+		            this.alertShow=false;
+		        },3000),
+				
+				this.login = this.loginChange,				
+				this.loginEdit = false
+			));     
+		},
+		loginCancel(){
+			this.userEdit = false,
+			this.loginEdit = false,
+			this.loginChange = this.login			 
+		},
+
+		passwordOK(){
+
+			if(this.passwordCurrent.trim().length>0){
+				if(this.passwordNew==this.passwordConfirm){
+				axios.post('/password_edit',{
+					new: this.passwordNew,
+					current: this.passwordCurrent
+				}).then(response => (
+					this.alertText = response.data.text,
+					this.status = response.data.status,
+					this.userEdit = (!(this.status == 'success')),				
+					this.alertShow=true,
+					window.setTimeout(()=>{
+			           this.alertShow=false;
+			        },3000),
+					
+					this.passwordCurrent = '',
+					this.passwordNew = '',
+					this.passwordConfirm = '',
+					this.passwordEdit = false
+				)); 
+				}
+				else{
+					this.alertText='Введенные пароли не совпадают',
+					this.status ='danger',
+					this.alertShow=true,
+					window.setTimeout(()=>{
+			            this.alertShow=false;
+			        },3000)
+				}
+			}
+			else{
+				this.alertText='Введите действующий пароль',
+				this.status ='danger',
+				this.alertShow=true,
+				window.setTimeout(()=>{
+		            this.alertShow=false;
+		        },3000)
+			}
+
+		},
+
+		passwordCancel(){
+			this.userEdit = false,
+			this.passwordEdit = false,
+			this.passwordCurrent = '',		 
+			this.passwordNew = '',		 
+			this.passwordConfirm = ''		 
+		},
 		cloneAvaBtn($event){
                 const elem = this.$refs.avaBtn;
                 elem.click();                
@@ -166,125 +248,69 @@ export default {
 
         },
         async download(){
-                this.showDownload = true;
-                let data = new FormData()
-                data.append('image', this.image)
+            this.showDownload = true;
+            let data = new FormData()
+            data.append('image', this.image)
 
-                await axios.post('/avatar/upload', data, {
-                    onUploadProgress: (itemUpload) =>{
-                        this.fileProgress = Math.round( (itemUpload.loaded/itemUpload.total)*100);
-                        this.fileCurrent = this.image.name + "%";
-                    }
-                }).then(response => (
-                    this.imgName = '',
-                    this.showDownload = false,
-                    this.ava_src = response.data.avatar
-                    // this.is_src = true,
-                    // this.url='/storage/' + response.data.path
-                   
-                )).catch(error => {
-                    console.log(error);
-                })
-                this.fileProgress=0;
-                this.fileCurrent='';
-            },
-            avaDelete(url){                
-                axios.post('/avatar/delete').then(response => {
-                	if (response.data.status=="delete"){
-                    	this.ava_src = '/img/no-image.jpg',
-                    	this.isAva = false
-                	}
+            await axios.post('/avatar/upload', data, {
+                onUploadProgress: (itemUpload) =>{
+                    this.fileProgress = Math.round( (itemUpload.loaded/itemUpload.total)*100);
+                    this.fileCurrent = this.image.name + "%";
+                }
+            }).then(response => (
+                this.imgName = '',
+                this.showDownload = false,
+                this.avaSrc = response.data.avatar,
+                this.userEdit = false,
+                this.avaEdit = false,
+                this.isAva = true
+                
+               
+            )).catch(error => {
+                console.log(error);
+            })
+            this.fileProgress=0;
+            this.fileCurrent='';
+        },
+        avaDelete(url){                
+            axios.post('/avatar/delete').then(response => {
+            	if (response.data.status=="delete"){
+                	this.avaSrc = '/img/no-image.jpg',
+                	this.isAva = false
+            	}
 
-                    // this.is_src = false,
-                    // this.url=''
-                    }).catch(error => {
-                    console.log(error);
-                })
-            },
-		editName(){
-			axios.post('/name_edit',{
-				name: this.this_name
-			}).then(response => (
-				this.edit_text = response.data.text,
-				this.status = response.data.status,
-				this.user_edit = (this.status == 'success'),				
-				this.alert_show=true,
-				window.setTimeout(()=>{
-		            this.alert_show=false;
-		        },3000),
-				
-				this.name = this.this_name,
-				this.current_password = '',
-				this.new_password = '',
-				this.password_confirm = '',
-				this.nameEdit = ''
-			));     
-		},
-		editPassword(){
+                }).catch(error => {
+                console.log(error);
+            })
+        },
+        avaCancel(){                
+			this.imgName = '',
+            this.showDownload = false,
+            this.userEdit = false,
+            this.avaEdit = false
+        },
 
-			if(this.current_password.trim().length>0){
-				if(this.new_password==this.password_confirm){
-				axios.post('/password_edit',{
-					new: this.new_password,
-					current: this.current_password
-				}).then(response => (
-					this.edit_text = response.data.text,
-					this.status = response.data.status,
-					this.user_edit = (this.status == 'success'),				
-					this.alert_show=true,
-					window.setTimeout(()=>{
-			           this.alert_show=false;
-			        },3000),
-					
-					this.current_password = '',
-					this.new_password = '',
-					this.password_confirm = '',
-					this.nameEdit = ''
-
-				)); 
-				}
-				else{
-					this.edit_text='Введенные пароли не совпадают',
-					this.status ='danger',
-					this.alert_show=true,
-					window.setTimeout(()=>{
-			            this.alert_show=false;
-			        },3000)
-				}
-			}
-			else{
-				this.edit_text='Введите действующий пароль',
-				this.status ='danger',
-				this.alert_show=true,
-				window.setTimeout(()=>{
-		            this.alert_show=false;
-		        },3000)
-			}
-
-		},
-		onLogin (data) {
-			console.log('child component said login', data)
-		},
-		editFolder(){
+		editFirstFolder(){
 			axios.post('/nav/main/edit',{
-				name: this.nameEdit
+				name: this.nameFolderFirstChange
 			}).then(response => (
-				this.folder_edit = false,
-				this.main_name = this.nameEdit
+				$("#navName_0").html(this.nameFolderFirstChange),
+				this.folderEdit = false,
+				this.nameFolderFirst = this.nameFolderFirstChange
 				));
 		},
-		addFolder(){
+		addNewFolder(){
 			axios.post('/nav/add', {
-				name: this.nameAdd,
+				name: this.folderNameAdd,
 				parent_id: 0,
 				level: 1
 			}).then(response => (
-				this.folder_add = false,
-				this.folders_this = JSON.parse(response.data.navs)
+				this.folderAdd = false,
+				this.folders = JSON.parse(response.data.navs)
 				));
 		},
 		reload(data){
-			this.folders_this = JSON.parse(data.folders);
+			this.folders = JSON.parse(data.folders);
 		}
 	}
 }

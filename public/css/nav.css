@@ -199,12 +199,8 @@ body {
     -moz-transition: opacity 0.8s, -moz-transform 0.8s;
     -webkit-transition: opacity 0.8s, -webkit-transform 0.8s;
 }
-.nav-main .user_text{
-    display: inline-block;
-    position: relative;
 
-} 
-.nav-main .user .user_name {
+.nav-main .user .login-name{
     display: inline-block;
     position: relative;
     color: #dadada;
@@ -229,14 +225,14 @@ body {
  * прикрутим трансфомации и плавные переходы
  */
  
-.nav-main .folder_list {
+.nav-main .folder-list {
     display: block;
     margin: 0;
     padding: 0;
     list-style: none;
 }
  
-.nav-main .folder_list .folder {
+.nav-main .folder-list .folder {
     line-height: 2.5;
     opacity: 0;
     -webkit-transform: translateX(-50%);
@@ -249,7 +245,7 @@ body {
     transition: opacity .5s .1s, transform .5s .1s;
 }
  
-[id='nav-toggle']:checked ~ .nav-main .folder_list .folder {
+[id='nav-toggle']:checked ~ .nav-main .folder-list .folder {
     opacity: 1;
     -webkit-transform: translateX(0);
     -moz-transform: translateX(0);
@@ -263,7 +259,7 @@ body {
  * оформление ссылок пунктов меню
  */
  
-.nav-main .folder_list .folder a {
+.nav-main .folder-list .folder a {
     display: inline-block;
     position: relative;
     padding: 0;
@@ -271,7 +267,6 @@ body {
     font-weight: 300;
     font-size: 1.2em;
     color: #dadada;
-    width: 100%;
     text-decoration: none;
     /* плавный переход */
     -webkit-transition: color .5s ease, padding .5s ease;
@@ -283,8 +278,8 @@ body {
  * состояние ссылок меню при наведении
  */
  
-.nav-main .folder_list .folder a:hover,
-.nav-main .folder_list .folder a:focus {
+.nav-main .folder-list .folder a:hover,
+.nav-main .folder-list .folder a:focus {
     color: white;
     padding-left: 15px;
 }
@@ -293,7 +288,7 @@ body {
  * линия подчеркивания ссылок меню
  */
  
-.nav-main .folder_list .folder a:before {
+.nav-main .folder-list .folder a:before {
     content: '';
     display: block;
     position: absolute;
@@ -305,7 +300,7 @@ body {
     transition: width 0s ease;
 }
  
-.nav-main .folder_list .folder a:after {
+.nav-main .folder-list .folder a:after {
     content: '';
     display: block;
     position: absolute;
@@ -323,14 +318,14 @@ body {
  * ссылок при наведении
  */
  
-.nav-main .folder_list .folder a:hover:before {
+.nav-main .folder-list .folder a:hover:before {
     width: 0%;
     background: #3bc1a0;
     -webkit-transition: width .5s ease;
     transition: width .5s ease;
 }
  
-.nav-main .folder_list .folder a:hover:after {
+.nav-main .folder-list .folder a:hover:after {
     width: 0%;
     background: transparent;
     -webkit-transition: width 0s ease;
@@ -366,49 +361,69 @@ body {
 
 
 
-
-.folder_add{
-    display:block;
-     width: 80%;
-}
-
 .nav-main .folder .folder a {
   position: relative;
 }
-.nav-main .name .edit, .user_name .save, .user_name .edit{
-  opacity: 0;
-  transition: 0.3s;
-  position: absolute;
-  top: 0px;
-  right: -40px;
-  z-index: 9;
-  text-decoration: none;
-  width: 30px;
-  cursor:pointer;
+
+.form-control-edit{
+    height: calc(2.25rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-.nav-main .name .add, .user_name .cancel {
-  opacity: 0;
-  transition: 0.3s;
-  position: absolute;
-  top: 0px;
-  right: -60px;
-  z-index: 9;
-  text-decoration: none;
-  width: 30px;
-  cursor:pointer;
+.folder-edit {
+    display: inline-block;
 }
-.nav-main .name .delete{
-  opacity: 0;
-  transition: 0.3s;
-  position: absolute;
-  top: 0px;
-  right: -80px;
-  z-index: 9;
-  text-decoration: none;
-  width: 30px;
-  cursor:pointer;
+.folder-edit .icon{
+    opacity: 0;
+    cursor:pointer;
 }
-.nav-main .folder:hover .add, .nav-main .folder:hover .edit, .nav-main .folder:hover .delete,
-.user_name:hover .save, .user_name:hover .cancel, .user_name:hover .edit{
-  opacity: 1;
+.folder-edit:hover .icon{
+    opacity: 1;
 }
+
+.nav-edit-footer{
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+}
+.nav-edit-login{
+  border: 1px solid #fd7e14;
+  padding: 5px;
+  height: 100px;
+  width: 150px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+}
+.nav-edit-password{
+  border: 1px solid #fd7e14;
+  padding: 5px;
+  height: 200px;
+  width: 200px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+}
+.nav-edit-ava{
+  border: 1px solid #fd7e14;
+  padding: 5px;
+
+  width: 200px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+}
+.item-pointer{
+    cursor: pointer;
+}
+

@@ -1,20 +1,20 @@
 <template>
     <div>
-        <div class="name" v-if="!folder_edit">
-            <a v-bind:href="'/tasks/'+this.folder.id">{{this.folder.name}}</a>
-            <div class="edit" @click="folder_edit = true">&#9998;</div>
-            <div class="add" @click="folder_add = true">&#10133;</div>
-            <div class="delete" @click="deleteFolder">&#10008;</div>
+        <div class="folder-edit" v-if="!edit">
+            <a v-bind:href="'/tasks/'+this.folder.id">{{name}}</a>
+            <font-awesome-icon icon="pencil-alt" color="#dadada" class="icon"  @click="edit = true" v-if="!add"/>
+            <font-awesome-icon icon="folder-plus" color="#dadada" class="icon" size="lg" @click="add = true" v-if="!add"/>
+            <font-awesome-icon icon="times" color="#dadada" class="icon" @click="deleteFolder" v-if="!add"/>
         </div>
-        <div class="name folder_edit" v-if="folder_edit">
-            <input type="text" name="folder_name_edit" id="f_name_edit" class="form-control" placeholder="Наименование" v-bind:value="this.folder.name">
-            <div class="save" @click="editFolder">&#10004;</div>
-            <div class="cancel" @click="folder_edit = false; nameEdit=''">&#10008;</div>
+        <div class="folder-edit" v-if="edit">
+            <input type="text" class="form-control-edit" placeholder="Наименование" v-model="name">
+            <font-awesome-icon icon="check" color="#dadada" class="icon"  @click="editFolder"/>
+            <font-awesome-icon icon="times" color="#dadada" class="icon" @click="edit = false; name = this.folder.name"/>
         </div>
-        <div class="name folder_add" v-if="folder_add">
-            <input type="text" name="folder_name_add" id="f_name_add" class="form-control" placeholder="Наименование" v-model="nameAdd">
-            <div class="save" @click="addFolder">&#10004;</div>
-            <div class="cancel" @click="folder_add = false; nameAdd=''">&#10008;</div>
+        <div class="folder-edit" v-if="add">
+            <input type="text" class="form-control-edit" placeholder="Наименование" v-model="nameAdd">
+            <font-awesome-icon icon="check" color="#dadada" class="icon"  @click="addFolder"/>
+            <font-awesome-icon icon="times" color="#dadada" class="icon" @click="add = false; nameAdd=''"/>
         </div>
     </div>
 </template>
@@ -24,8 +24,9 @@
         props:['folder','level'], 
         data(){
             return{
-                folder_add:false,
-                folder_edit:false,
+                add:false,
+                edit:false,
+                name: this.folder.name,
                 nameAdd:'',
             }
         },
@@ -35,9 +36,10 @@
         methods:{ 
             editFolder(){
                 axios.post('/nav/'+this.folder.id+'/edit',{
-                    name: $('#f_name_edit').val()
+                    name: this.name
                 }).then(response => (
-                    this.folder_edit = false,
+                    this.edit = false,
+                    $("#navName_"+this.folder.id).html(this.name),
                     this.$emit('navreload', {
                         folders: response.data.navs
                     })
@@ -50,7 +52,7 @@
                     level: this.level+1
                 }).then(response => (
                     this.nameAdd = '',
-                    this.folder_add = false,
+                    this.add = false,
                     this.$emit('navreload', {
                         folders: response.data.navs
                     })

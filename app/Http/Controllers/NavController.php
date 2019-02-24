@@ -25,31 +25,17 @@ class NavController extends Controller
         return $arr;
     }    
 
-    public function nav_index(){
-        $parent = \App\Setting::where('user','=', Auth::user()->id)->where('name','=', 'task_name')->first();
-        $user = Auth::user();
-
-        $navs = $this->recurs(\App\Nav::where('user','=', Auth::user()->id)->where('parent_id','=',0)->orderBy('name')->get());
-        $navs = json_encode($navs);
-
-        
-        return response(['status'=>'ok','navs'=> $navs, 'parent'=>$parent->property, 'user'=>$user], 200);
-    }
 
     public function nav_main_edit(Request $request){
         $validator = \Validator::make($request->all(),[
             'name'
         ]);
         if($validator->fails()){
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
+            return response(['status'=>'error', 'error'=>$validator->fails()], 200);
         }
-        $parent = \App\Setting::where('user','=', Auth::user()->id)->where('name','=', 'task_name')->first();
-
               
-        $parent->property = $request->name;;
-        $parent->save();
+        Auth::user()->task = $request->name;;
+        Auth::user()->save();
 
         return response(['status'=>'ok'], 200);
     }
@@ -59,9 +45,7 @@ class NavController extends Controller
             'name',
         ]);
         if($validator->fails()){
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
+           return response(['status'=>'error', 'error'=>$validator->fails()], 200);
         }
 
         $nav->name = $request->name;
@@ -80,9 +64,7 @@ class NavController extends Controller
             'level'
         ]);
         if($validator->fails()){
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
+            return response(['status'=>'error', 'error'=>$validator->fails()], 200);
         }
 
         $nav = new \App\Nav;
@@ -100,8 +82,20 @@ class NavController extends Controller
 
     public function nav_delete(\App\Nav $nav){
         $folders = $this->recurs(\App\Nav::where('user','=', Auth::user()->id)->where('parent_id','=',$nav->id)->orderBy('name')->get());
-        foreach($folders as $folder)
+        foreach($folders as $folder){
+            $tasks = \App\Task::where('nav','=', $folder->id)->get();
+            foreach ($tasks as $task) {
+                $task->delete();
+            }
+            Storage::deleteDirectory('public/uploads/user_'.Auth::user()->id.'/nav_'.$folder->id);
             $folder->delete();
+
+        }
+        $tasks = \App\Task::where('nav','=', $nav->id)->get();
+        foreach ($tasks as $task) {
+            $task->delete();
+        }
+        Storage::deleteDirectory('public/uploads/user_'.Auth::user()->id.'/nav_'.$nav->id);
         $nav->delete();
     
         $navs = $this->recurs(\App\Nav::where('user','=', Auth::user()->id)->where('parent_id','=',0)->orderBy('name')->get());

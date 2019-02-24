@@ -10,36 +10,28 @@ class SettingController extends Controller
 {
    public function angle_edit(Request $request){
         $validator = \Validator::make($request->all(),[
-            'angle'
+            'value'
         ]);
         if($validator->fails()){
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
+            return response(['status'=>'error', 'error'=>$validator->fails()], 200);
         }
-        $angle = \App\Setting::where('user','=', Auth::user()->id)->where('name','=', 'angle')->first();
-
-              
-        $angle->property = $request->angle;;
-        $angle->save();
+       
+        Auth::user()->angle = $request->value;
+        Auth::user()->save();
 
         return response(['status'=>'ok'], 200);
     }
     
     public function distance_edit(Request $request){
         $validator = \Validator::make($request->all(),[
-            'distance'
+            'value'
         ]);
         if($validator->fails()){
-            return redirect('/')
-                ->withInput()
-                ->withErrors($validator);
+            return response(['status'=>'error', 'error'=>$validator->fails()], 200);
         }
-        $distance = \App\Setting::where('user','=', Auth::user()->id)->where('name','=', 'distance')->first();
-
-              
-        $distance->property = $request->distance;;
-        $distance->save();
+        
+        Auth::user()->distance = $request->value;
+        Auth::user()->save();
 
         return response(['status'=>'ok'], 200);
     }

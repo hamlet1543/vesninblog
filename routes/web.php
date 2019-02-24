@@ -13,12 +13,16 @@
 
 Route::get('/', function () {
     return view('tasks');
-});
-Route::get('/tasks', 'TaskController@index');
-Route::get('/tasks/{nav}', 'TaskController@folder');
+})->name('no_user')->middleware('guest');;
+//Route::get('/', 'LoadPagesController@index_tasks')->middleware('guest');
+
+Route::get('/tasks', 'LoadPagesController@index_tasks')->name('tasks')->middleware('auth');
+Route::get('/tasks/{nav}', 'LoadPagesController@folder_tasks')->middleware('auth');
+
+
 Route::post('/tasks/add', 'TaskController@task_add');
-Route::post('/tasks/{nav}/image/upload', 'TaskController@image_upload')->name('image.upload');
-Route::post('/navs/{nav}/image/delete', 'TaskController@image_delete');
+Route::post('/tasks/image/upload', 'ImageController@image_upload')->name('image.upload');
+Route::post('/navs/image/delete', 'ImageController@image_delete');
 Route::post('/tasks/{task}/image/delete', 'TaskController@task_image_delete');
 Route::delete('/tasks/{task}', 'TaskController@delete');
 Route::post('/tasks/{task}/done', 'TaskController@done');
@@ -40,4 +44,7 @@ Route::post('/setting/distance_edit', 'SettingController@distance_edit');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');
+
+
+
